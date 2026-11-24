@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local config / secrets
+.env
+config.local.yaml
+
+# Arduino / PlatformIO build artifacts
+build/
+*.bin
+*.elf
+*.hex
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
