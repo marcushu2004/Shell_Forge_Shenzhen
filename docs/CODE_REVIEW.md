@@ -4,11 +4,14 @@
 评审日期：2026-11-24
 结论：整体架构清晰（线程 + 事件队列 + 脏标记渲染 + 优先级串口队列），协议设计简单可扩展；但存在 **3 个功能性缺陷**（其中 1 个会持续请求外部 API）、若干健壮性缺口和工程化债务。
 
+> **状态更新（2026-11-24）**：下文 3 个 P0 缺陷已修复，见 commit `fix: correct weather poller loop condition and surface failure events`。P1 / P2 项仍待处理。
+
+
 ---
 
 ## 一、问题清单（按严重度排序）
 
-### P0-1 天气线程循环条件写错，导致高频请求 API
+### P0-1 天气线程循环条件写错，导致高频请求 API — 已修复
 
 **位置**：`main_app.py` → `SeniverseWeatherPoller.run()`
 
@@ -34,7 +37,7 @@ def run(self):
 
 ---
 
-### P0-2 AI 失败后按钮永久禁用，无法重试
+### P0-2 AI 失败后按钮永久禁用，无法重试 — 已修复
 
 **位置**：`main_app.py` → `run_ai_engine()` 与 `drain_events()`
 
@@ -62,7 +65,7 @@ elif event_type == "ai_error":
 
 ---
 
-### P0-3 天气请求失败无任何界面反馈
+### P0-3 天气请求失败无任何界面反馈 — 已修复
 
 **位置**：`main_app.py` → `drain_events()`
 
@@ -184,5 +187,6 @@ elif event_type == "ai_error":
 | `requirements.txt` | 新增上位机依赖声明 |
 | `.gitignore` | 新增 Python / Arduino 构建产物忽略规则 |
 | `docs/CODE_REVIEW.md` | 新增本评审文档 |
+| `main_app.py` | **修复 3 个 P0 缺陷**：天气线程循环条件、`ai_error` 事件处理、天气错误反馈（共 14 行新增 / 1 行修改，未触碰业务逻辑） |
 
-代码逻辑本次**未改动**，上述 P0/P1 缺陷保持原样并在此文档中留档，待确认后可逐项提交修复。
+P1 及以上未修复项保持原样并在本文档留档，可逐项提交修复。

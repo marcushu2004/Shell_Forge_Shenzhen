@@ -266,7 +266,7 @@ class SeniverseWeatherPoller(threading.Thread):
         return city, weather_text, temperature_text
 
     def run(self):
-        while not self.stop_event.set():
+        while not self.stop_event.is_set():
             try:
                 city, weather_text, temperature_text = self.fetch_weather()
                 self.event_queue.put(("weather", "success", self.generation, city, weather_text, temperature_text))
@@ -646,6 +646,11 @@ class CyberPetGUI(ctk.CTk):
                     self.temperature_text = temperature_text
                     self.weather_status_var.set(f"Weather: {city} | {weather_text} | {temperature_text}")
                     self.log(f"Weather updated: {city} | {weather_text} | {temperature_text}")
+                elif status == "error":
+                    detail = payload[0] if payload else "unknown error"
+                    detail = " ".join(str(detail).split())[:80]
+                    self.weather_status_var.set(f"Weather: error -> {detail}")
+                    self.log(f"Weather error: {detail}")
 
             elif event_type == "ai_result":
                 _, request_id, mood, speech = event
@@ -655,6 +660,14 @@ class CyberPetGUI(ctk.CTk):
                 self.ai_mood = mood
                 self.ai_speech = speech
                 self.log(f"AI response: mood={mood}, speech='{speech}'")
+
+            elif event_type == "ai_error":
+                _, request_id, detail = event
+                if request_id != self.ai_request_id:
+                    continue
+                self.ai_button.configure(state="normal")
+                detail = " ".join(str(detail).split())[:120]
+                self.log(f"AI error: {detail}")
 
             # 功能2 & 3：解析水传感器与模拟喂食逻辑
             elif event_type == "water_data":
